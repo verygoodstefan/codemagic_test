@@ -1,0 +1,67 @@
+workflows:
+  development:
+    name: development
+    working_directory: very_good_project
+    max_build_duration: 60
+    environment:
+      flutter: 3.7.0
+      xcode: latest
+      cocoapods: default
+      vars:
+        FLAVOR: development
+        BUNDLE_ID: ventures.verygood.start.very-good-project.dev
+    cache:
+      cache_paths:
+        - $HOME/Library/Caches/CocoaPods
+        - $HOME/.pub-cache
+        - $HOME/.gradle/caches
+    triggering:
+      events:
+        - tag
+      # Include or exclude watched branches.
+      branch_patterns:
+        - pattern: "main"
+          include: true
+          source: true
+      # Include or exlude watched tag labels.
+      tag_patterns:
+        - pattern: "*"
+          include: true
+      # Set to `true` to automatically cancel outdated webhook builds.
+      cancel_previous_builds: true
+    scripts:
+      - &get_latest_tag
+        name: Get latest tag
+        script: set TAG=$(git describe --tags)
+    artifacts:
+      - build/app/outputs/apk/${FLAVOR}/release/*.apk
+      - build/app/outputs/bundle/${FLAVOR}Release/*.aab
+      - build/app/outputs/mapping/**/mapping.txt
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+  production:
+    name: production
+    working_directory: very_good_project
+    max_build_duration: 60
+    environment:
+      flutter: 3.7.0
+      xcode: latest
+      cocoapods: default
+      vars:
+        FLAVOR: production
+        BUNDLE_ID: ventures.verygood.start.very-good-project
+    cache:
+      cache_paths:
+        - $HOME/Library/Caches/CocoaPods
+        - $HOME/.pub-cache
+        - $HOME/.gradle/caches
+    scripts:
+      - *get_latest_tag
+    artifacts:
+      - build/app/outputs/apk/${FLAVOR}/release/*.apk
+      - build/app/outputs/bundle/${FLAVOR}Release/*.aab
+      - build/app/outputs/mapping/**/mapping.txt
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
