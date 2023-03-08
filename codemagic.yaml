@@ -30,9 +30,8 @@ workflows:
       # Set to `true` to automatically cancel outdated webhook builds.
       cancel_previous_builds: true
     scripts:
-      - &get_latest_tag
-        name: Get latest tag
-        script: set TAG=$(git describe --tags)
+      - Get packages
+      - script: flutter packages pub get
     artifacts:
       - build/app/outputs/apk/${FLAVOR}/release/*.apk
       - build/app/outputs/bundle/${FLAVOR}Release/*.aab
